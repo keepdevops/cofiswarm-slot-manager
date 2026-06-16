@@ -1,0 +1,62 @@
+{
+  "endpoints": [
+    {
+      "endpoint_id": "coder7b",
+      "engine": "llama",
+      "host": "127.0.0.1",
+      "port": 8086,
+      "names": [
+        "architect",
+        "debugger",
+        "optimizer",
+        "programmer"
+      ],
+      "draft_max": 0
+    },
+    {
+      "endpoint_id": "llama8b",
+      "engine": "llama",
+      "host": "127.0.0.1",
+      "port": 8085,
+      "names": [
+        "database",
+        "foreman",
+        "frontend",
+        "synthesis",
+        "tester"
+      ],
+      "draft_max": 0
+    },
+    {
+      "endpoint_id": "mlx1b",
+      "engine": "mlx",
+      "host": "127.0.0.1",
+      "port": 8083,
+      "names": [
+        "mlx-scout"
+      ],
+      "draft_max": 0
+    },
+    {
+      "endpoint_id": "gemma9b",
+      "engine": "llama",
+      "host": "127.0.0.1",
+      "port": 8084,
+      "names": [
+        "reviewer",
+        "security"
+      ],
+      "draft_max": 0
+    },
+    {
+      "endpoint_id": "gemma2b",
+      "engine": "llama",
+      "host": "127.0.0.1",
+      "port": 8087,
+      "names": [
+        "scout"
+      ],
+      "draft_max": 0
+    }
+  ]
+}

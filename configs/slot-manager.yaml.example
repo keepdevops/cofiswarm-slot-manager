@@ -1,0 +1,2 @@
+listen: ":8013"
+endpoints_file: /etc/cofiswarm/slot-manager/endpoints.json
