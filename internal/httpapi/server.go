@@ -41,6 +41,13 @@ func (s *Server) LoadEndpoints(path string) error {
 	return nil
 }
 
+// Endpoints returns a copy of the loaded endpoints (for the control loop).
+func (s *Server) Endpoints() []pressure.Endpoint {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	return append([]pressure.Endpoint(nil), s.endpoints...)
+}
+
 func (s *Server) Handler() http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/healthz", func(w http.ResponseWriter, _ *http.Request) {
