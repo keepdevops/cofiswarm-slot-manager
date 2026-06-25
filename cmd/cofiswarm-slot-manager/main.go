@@ -11,6 +11,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/keepdevops/cofiswarm-observer-sdk/pkg/buspresence"
 	"github.com/keepdevops/cofiswarm-observer-sdk/pkg/servicecomponent"
 	"github.com/keepdevops/cofiswarm-slot-manager/internal/bus"
 	"github.com/keepdevops/cofiswarm-slot-manager/internal/control"
@@ -51,8 +52,28 @@ func main() {
 		log.Printf("slot-manager control loop on (kvpool=%s)", kvURL)
 	}
 
-	log.Printf("slot-manager listening on %s", *addr)
-	log.Fatal(http.ListenAndServe(*addr, srv.Handler()))
+	// Carrier presence (broker-free, default-off via COFISWARM_BRIDGE_URL): appear in the
+	// observer live roster over the zmq-bridge without needing a NATS broker.
+	stopPresence := buspresence.StartPresence(os.Getenv("COFISWARM_BRIDGE_URL"), "slot-manager", map[string]any{"name": "slot-manager"})
+
+	httpSrv := &http.Server{Addr: *addr, Handler: srv.Handler()}
+	go func() {
+		log.Printf("slot-manager listening on %s", *addr)
+		if err := httpSrv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("slot-manager: server error: %v", err)
+		}
+	}()
+
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	defer stop()
+	<-ctx.Done()
+	log.Printf("slot-manager: shutting down")
+	stopPresence() // carrier goodbye -> offline
+	shutCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := httpSrv.Shutdown(shutCtx); err != nil {
+		log.Printf("slot-manager: graceful shutdown: %v", err)
+	}
 }
 
 func serveBus(url string, srv *httpapi.Server) {
