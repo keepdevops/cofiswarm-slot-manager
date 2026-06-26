@@ -35,6 +35,15 @@ func (s *Server) LoadEndpoints(path string) error {
 	if err := json.Unmarshal(b, &cfg); err != nil {
 		return err
 	}
+	// Optional host override: a containerized deploy fronting host inference sets
+	// COFISWARM_ENDPOINT_HOST=host.docker.internal so the roster resolves to the host without
+	// editing the repo config (which stays 127.0.0.1 for host/native runs). Mirrors the
+	// COFISWARM_AGENT_HOST override dispatch/modes use.
+	if host := os.Getenv("COFISWARM_ENDPOINT_HOST"); host != "" {
+		for i := range cfg.Endpoints {
+			cfg.Endpoints[i].Host = host
+		}
+	}
 	s.mu.Lock()
 	s.endpoints = cfg.Endpoints
 	s.mu.Unlock()

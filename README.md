@@ -37,6 +37,11 @@ Standalone — no FHS coupling. The endpoint roster is resolved in this order:
 Nothing is read from or written to `/etc/cofiswarm`, `/var/lib/cofiswarm`, or
 `/var/log/cofiswarm`.
 
+`COFISWARM_ENDPOINT_HOST` (optional) rewrites every endpoint host after load — a
+containerized deploy fronting host inference sets it to `host.docker.internal` so the
+roster resolves to the host without editing the repo config (which stays `127.0.0.1` for
+host/native runs). Mirrors the `COFISWARM_AGENT_HOST` override dispatch/modes use.
+
 ## Test
 
 ```bash
