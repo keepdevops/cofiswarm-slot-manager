@@ -24,13 +24,18 @@ make build
 ./bin/cofiswarm-slot-manager -config configs/endpoints.json
 ```
 
-## FHS
+## Configuration
 
-| Path | Purpose |
-|------|---------|
-| `/etc/cofiswarm/slot-manager/endpoints.json` | endpoint roster |
-| `/var/lib/cofiswarm/slot-manager/` | state |
-| `/var/log/cofiswarm/slot-manager/` | logs |
+Standalone — no FHS coupling. The endpoint roster is resolved in this order:
+
+| Source | Notes |
+|--------|-------|
+| `-config <path>` flag | highest precedence |
+| `COFISWARM_SLOT_MANAGER_CONFIG` env | for containers/host runners |
+| `configs/endpoints.json` (repo-relative) | default; ships with the binary |
+
+Nothing is read from or written to `/etc/cofiswarm`, `/var/lib/cofiswarm`, or
+`/var/log/cofiswarm`.
 
 ## Test
 
