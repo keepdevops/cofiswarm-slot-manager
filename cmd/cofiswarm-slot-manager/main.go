@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"strconv"
 	"syscall"
 	"time"
@@ -27,11 +28,14 @@ func main() {
 	busMode := flag.Bool("bus", false, "serve .slots.* on the NATS observer bus instead of HTTP")
 	natsURL := flag.String("nats", "nats://127.0.0.1:4222", "NATS URL (bus mode)")
 	flag.Parse()
+	// Standalone config resolution — no FHS coupling. Order: -config flag, then
+	// COFISWARM_SLOT_MANAGER_CONFIG, then the repo-relative configs/endpoints.json that ships
+	// with the binary. Containers/host runners point it elsewhere via the flag or env.
 	if *cfg == "" {
 		if v := os.Getenv("COFISWARM_SLOT_MANAGER_CONFIG"); v != "" {
 			*cfg = v
 		} else {
-			*cfg = "/etc/cofiswarm/slot-manager/endpoints.json"
+			*cfg = filepath.Join("configs", "endpoints.json")
 		}
 	}
 	srv, err := httpapi.New(*cfg)
